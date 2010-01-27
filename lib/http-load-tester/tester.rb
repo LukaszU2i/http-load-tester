@@ -29,7 +29,8 @@ module HttpLoadTester
     end
     
     def run
-      Logger.log "Warming up"
+      $stderr.puts ''
+      $stderr.puts "Warming up"
 
       run_scenarios
       print_summary
@@ -51,8 +52,8 @@ module HttpLoadTester
               
               scenario_instance.on_completion do |uri, response|
                 if response.status != 200
-                  Logger.log ''
-                  Logger.log "#{uri} failed with status #{response.status}"
+                   $stderr.puts ''
+                   $stderr.puts "#{uri} failed with status #{response.status}"
                 end
                 show_progress
                 increment
@@ -69,27 +70,34 @@ module HttpLoadTester
     end
     
     def print_summary
-      Logger.log ''
-      x = @stop_time - @start_time
-      Logger.log_summary @count, x
+      connection_time = @stop_time - @start_time
+      
+      if ENV['CSV'] == 'true'
+        $stdout.puts "#{NUMBER_OF_PROCS}, #{NUMBER_OF_REQUESTS}, #{@count}, #{connection_time}"
+        $stderr.puts "#{NUMBER_OF_PROCS}, #{NUMBER_OF_REQUESTS}, #{@count}, #{connection_time}"
+      end
+      
+      $stderr.puts "#{@count} request in #{connection_time} seconds"
+      $stderr.puts "#{@count/connection_time} requests per second"
     end
       
     def show_progress
-      Logger.log ".", true
+      $stderr.print '.'
+      $stderr.flush
     end
 
     def increment
       @mutex.synchronize do
         if @requests == NUMBER_OF_PROCS
           @start_time = Time.new
-          Logger.log ''
-          Logger.log "Starting"
+          $stderr.puts ''
+          $stderr.puts "Starting"
         end
         
         if @count == NUMBER_OF_REQUESTS
           @stop_time = Time.new
-          Logger.log ''
-          Logger.log "Stopping"
+          $stderr.puts ''
+          $stderr.puts "Stopping"
         end
       
         if @requests >= NUMBER_OF_PROCS && @count < NUMBER_OF_REQUESTS
