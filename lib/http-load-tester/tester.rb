@@ -29,7 +29,7 @@ module HttpLoadTester
     end
     
     def run
-      puts "Warming up"
+      Logger.log "Warming up"
 
       run_scenarios
       print_summary
@@ -51,8 +51,8 @@ module HttpLoadTester
               
               scenario_instance.on_completion do |uri, response|
                 if response.status != 200
-                  puts
-                  puts "#{uri} failed with status #{response.status}"
+                  Logger.log ''
+                  Logger.log "#{uri} failed with status #{response.status}"
                 end
                 show_progress
                 increment
@@ -69,29 +69,27 @@ module HttpLoadTester
     end
     
     def print_summary
-      puts
+      Logger.log ''
       x = @stop_time - @start_time
-      puts "#{@count} request in #{x} seconds"
-      puts "#{@count/x} requests per second"
+      Logger.log_summary @count, x
     end
       
     def show_progress
-      STDOUT.print "."
-      STDOUT.flush
+      Logger.log ".", true
     end
 
     def increment
       @mutex.synchronize do
         if @requests == NUMBER_OF_PROCS
           @start_time = Time.new
-          puts
-          puts "Starting"
+          Logger.log ''
+          Logger.log "Starting"
         end
         
         if @count == NUMBER_OF_REQUESTS
           @stop_time = Time.new
-          puts
-          puts "Stopping"
+          Logger.log ''
+          Logger.log "Stopping"
         end
       
         if @requests >= NUMBER_OF_PROCS && @count < NUMBER_OF_REQUESTS
