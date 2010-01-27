@@ -30,7 +30,7 @@ module HttpLoadTester
     
     def run
       $stderr.puts ''
-      $stderr.puts "Warming up"
+      $stderr.puts "Warming up - Procs: #{NUMBER_OF_PROCS} Requests: #{NUMBER_OF_REQUESTS} Csv: #{ENV['CSV']} " 
 
       run_scenarios
       print_summary
